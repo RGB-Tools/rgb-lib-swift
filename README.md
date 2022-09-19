@@ -9,6 +9,9 @@ the [rgb-lib-ffi] project, which is located inside the rgb-lib submodule.
 To use the Swift language bindings in your Xcode iOS or MacOS project add
 its GitHub repository (https://github.com/RGB-Tools/rgb-lib-swift) and select
 one of the release versions.
+Then link the C++ library by going to
+`Build Phases -> Link Binary With Libraries -> Add items (+)` and adding
+`libc++.tbd`.
 You may then import and use the `RgbLib` library in your Swift code.
 
 ## Build and publish
