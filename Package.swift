@@ -22,11 +22,11 @@ let package = Package(
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
-        .binaryTarget(name: "rgb_libFFI", path: "./rgb_libFFI.xcframework"),
-//        .binaryTarget(
-//           name: "rgb_libFFI",
-//           url: "https://github.com/RGB-Tools/rgb-lib-swift/releases/download/0.1.1/rgb_libFFI.xcframework.zip",
-//           checksum: "ad1d34e4afae42636d6549cc3465fd23886e2aa0de609f943e3b444c22ecbf0b"),
+//        .binaryTarget(name: "rgb_libFFI", path: "./rgb_libFFI.xcframework"),
+        .binaryTarget(
+           name: "rgb_libFFI",
+           url: "https://github.com/RGB-Tools/rgb-lib-swift/releases/download/0.1.1/rgb_libFFI.xcframework.zip",
+           checksum: "ce1a1761674c0c5ca3fec4cbced05d1bfe377d0a7cab01d6727d4d03a2fab248"),
         .target(
             name: "RgbLib",
             dependencies: ["rgb_libFFI"]),
