@@ -10,9 +10,8 @@ rm -rf "${XCFRAMEWORK_PATH:?}/*/"
 
 echo "Generating Swift bindings..."
 cargo run "${MANIFEST_PATH[@]}" \
-  --package rgb-lib-ffi-bindgen -- \
-  --language swift --udl-file $RGBLIBFFI_PATH/src/rgb-lib.udl \
-  --out-dir ./Sources/RgbLib
+  --bin rgb-lib-ffi-bindgen generate $RGBLIBFFI_PATH/src/rgb-lib.udl \
+  --language swift --out-dir ./Sources/RgbLib
 mv Sources/RgbLib/rgb_lib.swift Sources/RgbLib/RgbLib.swift
 
 echo "Building rgb-lib-ffi libs for Apple targets..."
