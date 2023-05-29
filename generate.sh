@@ -8,6 +8,13 @@ XCFRAMEWORK_PATH="rgb_libFFI.xcframework"
 
 rm -rf "${XCFRAMEWORK_PATH:?}/*/"
 
+echo "Installing/updating rust components..."
+rustup install nightly-2023-04-10-x86_64-apple-darwin
+rustup component add rust-src --toolchain nightly-2023-04-10-x86_64-apple-darwin
+rustup target add aarch64-apple-ios x86_64-apple-ios
+rustup target add aarch64-apple-ios-sim --toolchain nightly-2023-04-10
+rustup target add aarch64-apple-darwin x86_64-apple-darwin
+
 echo "Generating Swift bindings..."
 cargo run "${MANIFEST_PATH[@]}" \
   --bin rgb-lib-ffi-bindgen generate $RGBLIBFFI_PATH/src/rgb-lib.udl \
@@ -18,23 +25,23 @@ echo "Building rgb-lib-ffi libs for Apple targets..."
 TARGET_TRIPLES=("x86_64-apple-darwin" "aarch64-apple-darwin" "x86_64-apple-ios" "aarch64-apple-ios")
 for target in "${TARGET_TRIPLES[@]}"; do
   echo "Build rgb-lib-ffi lib for target $target"
-  cargo build "${MANIFEST_PATH[@]}" --target "$target"
+  cargo build --release "${MANIFEST_PATH[@]}" --target "$target"
 done
 # special build for M1 ios simulator
-cargo +nightly build -Z build-std \
+cargo +nightly-2023-04-10 build --release -Z build-std \
   "${MANIFEST_PATH[@]}" --target aarch64-apple-ios-sim
 
 echo "Create lipo static libs for ios-sim to support M1"
-mkdir -p $RGBLIBFFI_PATH/target/lipo-ios-sim/debug
-lipo $RGBLIBFFI_PATH/target/aarch64-apple-ios-sim/debug/librgblibffi.a \
-  $RGBLIBFFI_PATH/target/x86_64-apple-ios/debug/librgblibffi.a -create \
-  -output $RGBLIBFFI_PATH/target/lipo-ios-sim/debug/librgblibffi.a
+mkdir -p $RGBLIBFFI_PATH/target/lipo-ios-sim/release
+lipo $RGBLIBFFI_PATH/target/aarch64-apple-ios-sim/release/librgblibffi.a \
+  $RGBLIBFFI_PATH/target/x86_64-apple-ios/release/librgblibffi.a -create \
+  -output $RGBLIBFFI_PATH/target/lipo-ios-sim/release/librgblibffi.a
 
 echo "Create lipo static libs for macos to support M1"
-mkdir -p $RGBLIBFFI_PATH/target/lipo-macos/debug
-lipo $RGBLIBFFI_PATH/target/aarch64-apple-darwin/debug/librgblibffi.a \
-  $RGBLIBFFI_PATH/target/x86_64-apple-darwin/debug/librgblibffi.a -create \
-  -output $RGBLIBFFI_PATH/target/lipo-macos/debug/librgblibffi.a
+mkdir -p $RGBLIBFFI_PATH/target/lipo-macos/release
+lipo $RGBLIBFFI_PATH/target/aarch64-apple-darwin/release/librgblibffi.a \
+  $RGBLIBFFI_PATH/target/x86_64-apple-darwin/release/librgblibffi.a -create \
+  -output $RGBLIBFFI_PATH/target/lipo-macos/release/librgblibffi.a
 
 XCFRAMEWORK_LIBS=("ios-arm64" "ios-arm64_x86_64-simulator" "macos-arm64_x86_64")
 for lib in "${XCFRAMEWORK_LIBS[@]}"; do
@@ -63,9 +70,9 @@ EOF
 done
 
 echo "Copy librgblibffi.a files to $XCFRAMEWORK_PATH/rgb_libFFI"
-cp $RGBLIBFFI_PATH/target/aarch64-apple-ios/debug/librgblibffi.a $XCFRAMEWORK_PATH/ios-arm64/rgb_libFFI.framework/rgb_libFFI
-cp $RGBLIBFFI_PATH/target/lipo-ios-sim/debug/librgblibffi.a $XCFRAMEWORK_PATH/ios-arm64_x86_64-simulator/rgb_libFFI.framework/rgb_libFFI
-cp $RGBLIBFFI_PATH/target/lipo-macos/debug/librgblibffi.a $XCFRAMEWORK_PATH/macos-arm64_x86_64/rgb_libFFI.framework/rgb_libFFI
+cp $RGBLIBFFI_PATH/target/aarch64-apple-ios/release/librgblibffi.a $XCFRAMEWORK_PATH/ios-arm64/rgb_libFFI.framework/rgb_libFFI
+cp $RGBLIBFFI_PATH/target/lipo-ios-sim/release/librgblibffi.a $XCFRAMEWORK_PATH/ios-arm64_x86_64-simulator/rgb_libFFI.framework/rgb_libFFI
+cp $RGBLIBFFI_PATH/target/lipo-macos/release/librgblibffi.a $XCFRAMEWORK_PATH/macos-arm64_x86_64/rgb_libFFI.framework/rgb_libFFI
 
 # remove unneed .h and .modulemap files
 rm Sources/RgbLib/rgb_libFFI.h

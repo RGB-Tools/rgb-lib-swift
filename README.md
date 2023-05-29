@@ -23,11 +23,6 @@ project to your own Github repository use the following steps:
 # Update the submodule
 git submodule update --init
 
-# Add Apple rust targets
-rustup target add aarch64-apple-ios x86_64-apple-ios
-rustup target add aarch64-apple-ios-sim --toolchain nightly
-rustup target add aarch64-apple-darwin x86_64-apple-darwin
-
 # Generate the bindings and FFI ZIP
 ./generate.sh
 ```
