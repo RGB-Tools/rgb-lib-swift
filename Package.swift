@@ -25,8 +25,8 @@ let package = Package(
 //        .binaryTarget(name: "rgb_libFFI", path: "./rgb_libFFI.xcframework"),
         .binaryTarget(
            name: "rgb_libFFI",
-           url: "https://github.com/RGB-Tools/rgb-lib-swift/releases/download/0.2.0-alpha.2/rgb_libFFI.xcframework.zip",
-           checksum: "00a4854f9822b007a64da4db50f978a0049e7fdac89a79d116fe8b58bb908bf0"),
+           url: "https://github.com/RGB-Tools/rgb-lib-swift/releases/download/0.2.0/rgb_libFFI.xcframework.zip",
+           checksum: "67dc46cae48ff0a4a89ca9e5e7cb67adbd4f905dabb5411ae80ccd90c78c4754"),
         .target(
             name: "RgbLib",
             dependencies: ["rgb_libFFI"]),
