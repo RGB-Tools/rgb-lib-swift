@@ -2,7 +2,7 @@
 
 This project builds a Swift library, `RgbLib`, for the [rgb-lib]
 Rust library, which is included as a git submodule. The bindings are created by
-the [rgb-lib-ffi] project, which is located inside the rgb-lib submodule.
+the [rgb-lib-uniffi] project, which is located inside the rgb-lib submodule.
 
 ## Usage
 
@@ -33,8 +33,8 @@ For example:
 ```swift
 .binaryTarget(
    name: "rgb_libFFI",
-   url: "https://github.com/RGB-Tools/rgb-lib-swift/releases/download/0.3.0-alpha.4/rgb_libFFI.xcframework.zip",
-   checksum: "2c27a25e6bf1d34fdcddd680c6272346bbd03df48e5895f3cae9311c2def68e7"),
+   url: "https://github.com/RGB-Tools/rgb-lib-swift/releases/download/0.3.0-alpha.6/rgb_libFFI.xcframework.zip",
+   checksum: "e0892841c456cfc5f69b7c7e42889f1a51e71ae96d57a67ec5e999f7914ac245"),
 ```
 
 Commit the changed `Package.swift` file, then tag the commit with the new
@@ -49,4 +49,4 @@ If you get an error you might need to reset the Xcode package caches:
 
 
 [rgb-lib]: https://github.com/RGB-Tools/rgb-lib
-[rgb-lib-ffi]: https://github.com/RGB-Tools/rgb-lib/tree/master/rgb-lib-ffi
+[rgb-lib-uniffi]: https://github.com/RGB-Tools/rgb-lib/tree/master/bindings/uniffi
