@@ -22,14 +22,27 @@ cargo run "${MANIFEST_PATH[@]}" \
 mv Sources/RgbLib/rgb_lib.swift Sources/RgbLib/RgbLib.swift
 
 echo "Building rgb-lib uniffi libs for Apple targets..."
-TARGET_TRIPLES=("x86_64-apple-darwin" "aarch64-apple-darwin" "x86_64-apple-ios" "aarch64-apple-ios")
+TARGET_TRIPLES=(
+  "x86_64-apple-darwin"
+  "aarch64-apple-darwin"
+  "x86_64-apple-ios"
+  "aarch64-apple-ios"
+  "aarch64-apple-ios-sim"
+)
 for target in "${TARGET_TRIPLES[@]}"; do
   echo "Build rgb-lib uniffi lib for target $target"
-  cargo build "${MANIFEST_PATH[@]}" --target "$target"
+  if [ "$target" == "aarch64-apple-ios" ]; then
+    IPHONEOS_DEPLOYMENT_TARGET=16.0 CFLAGS="-mios-version-min=16.0" \
+      CXXFLAGS="-mios-version-min=16.0" \
+      cargo build "${MANIFEST_PATH[@]}" --target "$target"
+  elif [ "$target" == "aarch64-apple-ios" ]; then
+    # special build for M1 ios simulator
+    cargo +nightly build -Z build-std \
+      "${MANIFEST_PATH[@]}" --target "$target"
+  else
+    cargo build "${MANIFEST_PATH[@]}" --target "$target"
+  fi
 done
-# special build for M1 ios simulator
-cargo +nightly build -Z build-std \
-  "${MANIFEST_PATH[@]}" --target aarch64-apple-ios-sim
 
 echo "Create lipo static libs for ios-sim to support M1"
 mkdir -p $RGBLIBFFI_PATH/target/lipo-ios-sim/debug
