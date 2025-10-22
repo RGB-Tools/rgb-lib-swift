@@ -4108,10 +4108,11 @@ public struct Transfer {
     public var expiration: Int64?
     public var transportEndpoints: [TransferTransportEndpoint]
     public var invoiceString: String?
+    public var consignmentPath: String?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(idx: Int32, batchTransferIdx: Int32, createdAt: Int64, updatedAt: Int64, status: TransferStatus, requestedAssignment: Assignment?, assignments: [Assignment], kind: TransferKind, txid: String?, recipientId: String?, receiveUtxo: Outpoint?, changeUtxo: Outpoint?, expiration: Int64?, transportEndpoints: [TransferTransportEndpoint], invoiceString: String?) {
+    public init(idx: Int32, batchTransferIdx: Int32, createdAt: Int64, updatedAt: Int64, status: TransferStatus, requestedAssignment: Assignment?, assignments: [Assignment], kind: TransferKind, txid: String?, recipientId: String?, receiveUtxo: Outpoint?, changeUtxo: Outpoint?, expiration: Int64?, transportEndpoints: [TransferTransportEndpoint], invoiceString: String?, consignmentPath: String?) {
         self.idx = idx
         self.batchTransferIdx = batchTransferIdx
         self.createdAt = createdAt
@@ -4127,6 +4128,7 @@ public struct Transfer {
         self.expiration = expiration
         self.transportEndpoints = transportEndpoints
         self.invoiceString = invoiceString
+        self.consignmentPath = consignmentPath
     }
 }
 
@@ -4182,6 +4184,9 @@ extension Transfer: Equatable, Hashable {
         if lhs.invoiceString != rhs.invoiceString {
             return false
         }
+        if lhs.consignmentPath != rhs.consignmentPath {
+            return false
+        }
         return true
     }
 
@@ -4201,6 +4206,7 @@ extension Transfer: Equatable, Hashable {
         hasher.combine(expiration)
         hasher.combine(transportEndpoints)
         hasher.combine(invoiceString)
+        hasher.combine(consignmentPath)
     }
 }
 
@@ -4227,7 +4233,8 @@ public struct FfiConverterTypeTransfer: FfiConverterRustBuffer {
                 changeUtxo: FfiConverterOptionTypeOutpoint.read(from: &buf), 
                 expiration: FfiConverterOptionInt64.read(from: &buf), 
                 transportEndpoints: FfiConverterSequenceTypeTransferTransportEndpoint.read(from: &buf), 
-                invoiceString: FfiConverterOptionString.read(from: &buf)
+                invoiceString: FfiConverterOptionString.read(from: &buf), 
+                consignmentPath: FfiConverterOptionString.read(from: &buf)
         )
     }
 
@@ -4247,6 +4254,7 @@ public struct FfiConverterTypeTransfer: FfiConverterRustBuffer {
         FfiConverterOptionInt64.write(value.expiration, into: &buf)
         FfiConverterSequenceTypeTransferTransportEndpoint.write(value.transportEndpoints, into: &buf)
         FfiConverterOptionString.write(value.invoiceString, into: &buf)
+        FfiConverterOptionString.write(value.consignmentPath, into: &buf)
     }
 }
 
@@ -5294,6 +5302,8 @@ public enum RgbLibError: Swift.Error {
     case TooHighIssuanceAmounts
     case UnknownRgbSchema(schemaId: String
     )
+    case UnknownTransfer(txid: String
+    )
     case UnsupportedBackupVersion(version: String
     )
     case UnsupportedLayer1(layer1: String
@@ -5472,21 +5482,24 @@ public struct FfiConverterTypeRgbLibError: FfiConverterRustBuffer {
         case 71: return .UnknownRgbSchema(
             schemaId: try FfiConverterString.read(from: &buf)
             )
-        case 72: return .UnsupportedBackupVersion(
+        case 72: return .UnknownTransfer(
+            txid: try FfiConverterString.read(from: &buf)
+            )
+        case 73: return .UnsupportedBackupVersion(
             version: try FfiConverterString.read(from: &buf)
             )
-        case 73: return .UnsupportedLayer1(
+        case 74: return .UnsupportedLayer1(
             layer1: try FfiConverterString.read(from: &buf)
             )
-        case 74: return .UnsupportedSchema(
+        case 75: return .UnsupportedSchema(
             assetSchema: try FfiConverterTypeAssetSchema.read(from: &buf)
             )
-        case 75: return .UnsupportedTransportType
-        case 76: return .WalletDirAlreadyExists(
+        case 76: return .UnsupportedTransportType
+        case 77: return .WalletDirAlreadyExists(
             path: try FfiConverterString.read(from: &buf)
             )
-        case 77: return .WatchOnly
-        case 78: return .WrongPassword
+        case 78: return .WatchOnly
+        case 79: return .WrongPassword
 
          default: throw UniffiInternalError.unexpectedEnumCase
         }
@@ -5824,36 +5837,41 @@ public struct FfiConverterTypeRgbLibError: FfiConverterRustBuffer {
             FfiConverterString.write(schemaId, into: &buf)
             
         
-        case let .UnsupportedBackupVersion(version):
+        case let .UnknownTransfer(txid):
             writeInt(&buf, Int32(72))
+            FfiConverterString.write(txid, into: &buf)
+            
+        
+        case let .UnsupportedBackupVersion(version):
+            writeInt(&buf, Int32(73))
             FfiConverterString.write(version, into: &buf)
             
         
         case let .UnsupportedLayer1(layer1):
-            writeInt(&buf, Int32(73))
+            writeInt(&buf, Int32(74))
             FfiConverterString.write(layer1, into: &buf)
             
         
         case let .UnsupportedSchema(assetSchema):
-            writeInt(&buf, Int32(74))
+            writeInt(&buf, Int32(75))
             FfiConverterTypeAssetSchema.write(assetSchema, into: &buf)
             
         
         case .UnsupportedTransportType:
-            writeInt(&buf, Int32(75))
+            writeInt(&buf, Int32(76))
         
         
         case let .WalletDirAlreadyExists(path):
-            writeInt(&buf, Int32(76))
+            writeInt(&buf, Int32(77))
             FfiConverterString.write(path, into: &buf)
             
         
         case .WatchOnly:
-            writeInt(&buf, Int32(77))
+            writeInt(&buf, Int32(78))
         
         
         case .WrongPassword:
-            writeInt(&buf, Int32(78))
+            writeInt(&buf, Int32(79))
         
         }
     }
