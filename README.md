@@ -33,8 +33,8 @@ For example:
 ```swift
 .binaryTarget(
    name: "rgb_libFFI",
-   url: "https://github.com/RGB-Tools/rgb-lib-swift/releases/download/0.3.0-beta.3/rgb_libFFI.xcframework.zip",
-   checksum: "056de41b2773f61dbc96cfcea3cba818dd2db3d65b087203ff60c065ab7e6faf"),
+   url: "https://github.com/RGB-Tools/rgb-lib-swift/releases/download/0.3.0-beta.4/rgb_libFFI.xcframework.zip",
+   checksum: "51557d776de1c1c7d31687b1a54b75a194cfbaee567ee9f1c62f6363b5fb97cc"),
 ```
 
 Commit the changed `Package.swift` file, then tag the commit with the new
